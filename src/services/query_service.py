@@ -12,6 +12,7 @@ class QueryService:
     
     async def generate_response(self, user_id, request):
         user_query = await self.fetch_query(request)
+        user_query=user_query+" Dont tell me is there anything else you would like to know. Give me the (detailed + sufficient) final answer"
         task_id = await self.query_dao.add_record_to_db(user_id, user_query)
         await self.query_dao.update_status(task_id, 'Inprogress')
 

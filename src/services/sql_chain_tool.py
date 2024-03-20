@@ -36,8 +36,8 @@ class SQLCustomTool(BaseTool):
             """
 
         prompt = ChatPromptTemplate.from_template(template=template)
-        prompt.format(schema = "my schema",question = "how many users are there")
-        db_uri = "mysql+mysqlconnector://root:MANOsince%402003@localhost:3306/ClassicModels"
+        # prompt.format(schema = "my schema",question = "how many users are there")
+        db_uri = "mysql+mysqlconnector://root:123@localhost:3306/classicmodels"
         db = SQLDatabase.from_uri(db_uri)
 
         def get_schema(_):

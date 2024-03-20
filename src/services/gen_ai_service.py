@@ -32,6 +32,7 @@ class GenAiService:
     async def generate_response(self, user_query, user_id):
         
 
+        # user_query=user_query+" Dont tell me is there anything else you would like to know. Give me the (detailed + sufficient) final answer"
         load_dotenv()
         api_key=os.getenv("OPENAI_API_KEY")
 
@@ -40,17 +41,13 @@ class GenAiService:
             temperature=0
         )
 
-        prompt = PromptTemplate(
+        chain_prompt = PromptTemplate(
             input_variables=["query"],
             template="{query}"
         )
 
-        prompt = hub.pull("hwchase17/react")
 
-        # prompt_template = """Use the following as it is:"{text}"DO NOT SUMMARIZE:"""
-        # PROMPT = PromptTemplate(template=prompt_template, input_variables=["text"])
-
-        llm_chain = LLMChain(llm=llm, prompt=prompt)
+        llm_chain = LLMChain(llm=llm, prompt=chain_prompt)
 
         llm_math = LLMMathChain(llm=llm)
 
@@ -98,7 +95,7 @@ class GenAiService:
         tools.extend(arxiv_tool)
 
 
-        prompt = hub.pull("hwchase17/react")
+        prompt = hub.pull("hwchase17/openai-functions-agent")
         tools = sql_tool
         memory = ConversationBufferMemory(memory_key="chat_history")
         previous_chats = await self.user_dao.fetch_previous_chat(user_id)
@@ -137,11 +134,12 @@ class GenAiService:
             verbose=True,
             max_iterations=5,
             memory=memory,
+            prompt=prompt,
             handle_parsing_errors=True,
             )
 
-
-        output = conversational_agent.run(input=user_query)
+        # print(user_query+" Dont add 'Is there anything else you would like to know?'. Give a detailed and a sufficient, simple answer.")
+        output = conversational_agent.run(input=(user_query))
 
         return output
 
